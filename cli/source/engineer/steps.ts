@@ -65,7 +65,7 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
         userInput =( await inquirer.prompt([{
             type: 'input',
             name: 'userInput',
-            message:`${msg}(answer in text, or "c" to move on)\n`}])).userInput;
+            message:`(answer in text, or "c" to move on)\n`}])).userInput;
  
         console.log();
         if (!userInput || userInput === 'c') {
@@ -160,7 +160,7 @@ async function executeEntrypoint(_ai: AI, dbs: DBs): Promise <Message[]> {
     const userInput  =( await inquirer.prompt([{
         type: 'input',
         name: 'userInput',
-        message:'(answer in text, or "c" to move on)\n'}])).userInput;
+        message:'(answer in complete text, or "c" to move on)\n'}])).userInput;
     if (!['', 'y', 'yes'].includes(userInput)) {
         console.log('Ok, not executing the code.');
         return [];

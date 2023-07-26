@@ -54,13 +54,11 @@ export class AI {
 
     constructor(model_name = "gpt-4", temperature = 0.1) {
         this.temperature = temperature;
-        this.model_name= model_name;
-        // this.initAI(model_name, temperature).then(a => console.log("model loading complete", a));
-          // initialize token usage log
-          this.cumulative_prompt_tokens = 0;
-          this.cumulative_completion_tokens = 0;
-          this.cumulative_total_tokens = 0;
-          this.token_usage_log = [];
+        this.model_name = model_name;
+        this.cumulative_prompt_tokens = 0;
+        this.cumulative_completion_tokens = 0;
+        this.cumulative_total_tokens = 0;
+        this.token_usage_log = [];
     }
 
     async start(system: string, user: string, step_name: string): Promise<Message[]> {
@@ -95,7 +93,9 @@ export class AI {
             console.log("LLM not initialised");
             return []
         }
-
+        console.log(messages, "messages");
+        console.log(prompt, "prompt");
+        
         let response = await this.llm.call(messages);  // type: ignore
         messages.push(response);
 
