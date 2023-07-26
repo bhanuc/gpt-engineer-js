@@ -1,4 +1,4 @@
-# GPT Engineer
+# GPT Engineer port in Typescript
 
 [![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
 [![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
@@ -26,14 +26,10 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 Choose either **stable** or **development**.
 
 For **stable** release:
-
-- `pip install gpt-engineer`
+  - coming soon
 
 For **development**:
-- `git clone https://github.com/AntonOsika/gpt-engineer.git`
-- `cd gpt-engineer`
-- `pip install -e .`
-  - (or: `make install && source venv/bin/activate` for a venv)
+  - coming soon
 
 **Setup**
 
@@ -71,16 +67,8 @@ Editing the `preprompts`, and evolving how you write the project prompt, is how 
 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
-## Vision
-The gpt-engineer community is building the **open platform for devs to tinker with and build their personal code-generation toolbox**.
-
-If you are interested in contributing to this, we would be interested in having you.
-
-If you want to see our broader ambitions, check out the [roadmap](https://github.com/AntonOsika/gpt-engineer/blob/main/ROADMAP.md), and join
-[discord](https://discord.gg/8tcDQ89Ej2)
-to get input on how you can [contribute](.github/CONTRIBUTING.md) to it.
-
-We are currently looking for more maintainers and community organisers. Email anton.osika@gmail.com if you are interested in an official role.
+## Credits
+Based on the implementaion of [GPT-Engineer](https://github.com/AntonOsika/gpt-engineer) . More details will be added soon.
 
 
 ## Example

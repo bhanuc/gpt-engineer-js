@@ -58,3 +58,6 @@ benchmark
 !benchmark/*/prompt
 
 .gpte_consent
+
+archive/*
+node_modules/
