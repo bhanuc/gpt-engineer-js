@@ -16,16 +16,15 @@ export async function Main({
     model = "gpt-4",
     temperature = 0.1,
     stepsConfig= StepsConfig.DEFAULT,
-    verbose = false,
 }: { projectPath?: string, model?: string, temperature?: number, stepsConfig?: StepsConfig, verbose?: Boolean }
 ): Promise<void> {
     // Implement logging here...
-    console.log(verbose);
+    // console.log(verbose);
     
 
-    model = fallbackModel(model);
+    model = await fallbackModel(model);
     let ai = new AI(model, temperature);
-
+            await ai.initAI();
     let inputPath = path.resolve(projectPath);
     let memoryPath = path.join(inputPath, "memory");
     let workspacePath = path.join(inputPath, "workspace");

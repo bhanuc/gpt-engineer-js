@@ -2,7 +2,8 @@ import { AIMessage, HumanMessage, SystemMessage } from 'langchain/schema';
 // import { StreamingStdOutCallbackHandler } from 'langchain.callbacks.streaming_stdout';
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { BaseChatModel } from 'langchain/chat_models';
-import {  encoding_for_model } from "@dqbd/tiktoken";
+import { encoding_for_model } from "@dqbd/tiktoken";
+import { Configuration, OpenAIApi } from 'openai';
 // import { State } from '../app.js';
 
 export type Message = AIMessage | HumanMessage | SystemMessage;
@@ -38,24 +39,28 @@ class TokenUsage {
 export class AI {
     temperature: number;
     model_name: string;
-    llm: BaseChatModel;
+    llm?: BaseChatModel;
     tokenizer: any; // Replace with correct type
     cumulative_prompt_tokens: number;
     cumulative_completion_tokens: number;
     cumulative_total_tokens: number;
     token_usage_log: TokenUsage[];
 
-    constructor(model_name = "gpt-4", temperature = 0.1 ) {
-        this.temperature = temperature;
-        this.model_name = fallbackModel(model_name);
-        this.llm = createChatModel(this.model_name, temperature);
+    async initAI() {
+        this.model_name = await fallbackModel(this.model_name);
+        this.llm = createChatModel(this.model_name, this.temperature);
         this.tokenizer = get_tokenizer(this.model_name);
+    }
 
-        // initialize token usage log
-        this.cumulative_prompt_tokens = 0;
-        this.cumulative_completion_tokens = 0;
-        this.cumulative_total_tokens = 0;
-        this.token_usage_log = [];
+    constructor(model_name = "gpt-4", temperature = 0.1) {
+        this.temperature = temperature;
+        this.model_name= model_name;
+        // this.initAI(model_name, temperature).then(a => console.log("model loading complete", a));
+          // initialize token usage log
+          this.cumulative_prompt_tokens = 0;
+          this.cumulative_completion_tokens = 0;
+          this.cumulative_total_tokens = 0;
+          this.token_usage_log = [];
     }
 
     async start(system: string, user: string, step_name: string): Promise<Message[]> {
@@ -85,6 +90,10 @@ export class AI {
     ): Promise<Message[]> {
         if (prompt) {
             messages.push(this.fuser(prompt));
+        }
+        if (!this.llm) {
+            console.log("LLM not initialised");
+            return []
         }
 
         let response = await this.llm.call(messages);  // type: ignore
@@ -165,21 +174,31 @@ export class AI {
     }
 }
 
-export function fallbackModel(model: string): string {
-    // Implementation here
-    console.log('fallback', model);
-    
+export async function fallbackModel(model: string): Promise<string> {
+    try {
+        const configuration = new Configuration({
+            apiKey: process.env['OPENAI_API_KEY'],
+        });
+        const openai = new OpenAIApi(configuration);
+        const response = await openai.retrieveModel(model);
+        if (response.status === 200) {
+            return model;
+        }
+    } catch (error) {
+        console.log('error with model ', model);
+
+    }
     return "gpt-3.5-turbo";
 }
 
 function createChatModel(model: string, temperature: number): BaseChatModel {
     switch (model) {
         case 'gpt-4':
-            return new ChatOpenAI({modelName:'gpt-4' , temperature}
-      
+            return new ChatOpenAI({ modelName: 'gpt-4', temperature }
+
             );
         case 'gpt-3.5-turbo':
-            return new ChatOpenAI({modelName:'gpt-3.5-turbo' , temperature}
+            return new ChatOpenAI({ modelName: 'gpt-3.5-turbo', temperature }
             );
         default:
             throw new Error(`Model ${model} is not supported.`);
