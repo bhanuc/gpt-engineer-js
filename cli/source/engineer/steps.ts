@@ -35,7 +35,7 @@ function getPrompt(dbs: DBs): string {
     //     return dbs.input['main_prompt'] as string;
     // }
 
-    return dbs.preprompts.get('prompt') as string;
+    return dbs.input.get('prompt') as string;
 }
 
 // This assumes the AI class and its methods are defined with the same interface in TypeScript
@@ -51,8 +51,9 @@ async function simpleGen(ai: AI, dbs: DBs): Promise <Message[]> {
 async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
     let messages: Message[] = [ai.fsystem(dbs.preprompts.get('clarify'))];
     let userInput = getPrompt(dbs);
+
     while (true) {
-        messages = await ai.next(messages, userInput, currFn());
+        messages = await ai.next(messages,  currFn(), userInput);
         let msg = messages[messages.length - 1]?.content.trim();
         console.log(msg)
         if (msg === 'Nothing more to clarify.') {
@@ -73,8 +74,8 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
             console.log();
             messages = await ai.next(
                 messages,
+                currFn(),
                 'Make your own assumptions and state them explicitly before starting',
-                currFn()
             );
             console.log();
             return messages;
@@ -102,7 +103,7 @@ async function genClarifiedCode(ai: AI, dbs: DBs): Promise<Message[]> {
         ai.fsystem(setupSysPrompt(dbs)),
         ...messages.slice(1)
     ];
-    messages = await ai.next(messages, dbs.preprompts.get('use_qa'), currFn());
+    messages = await ai.next(messages,  currFn(), dbs.preprompts.get('use_qa'));
     let msg = messages[messages.length - 1]?.content.trim();
     if(msg ) {
         toFiles( msg, dbs.workspace);
