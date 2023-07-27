@@ -5,12 +5,7 @@ import { collectLearnings } from './collect.js';
 import { DB, DBs, archive } from './db.js';
 import { collectConsent } from './learning.js';
 import { STEPS, Config as StepsConfig } from './steps.js';
-// import { dirname } from 'path';
-// import { fileURLToPath } from 'url';
 
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
 export async function Main({
     projectPath = "projects/example",
     model = "gpt-4",
