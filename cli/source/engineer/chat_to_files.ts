@@ -30,7 +30,7 @@ export function parseChat(chat: string): Array<{path: string, code: string}> {
 }
 
 export function toFiles(chat: string, workspace: DB) {
-
+    workspace.set("all_output.txt", chat);
     let files = parseChat(chat);
     for (let file of files) {
     workspace.set(file.path, file.code);

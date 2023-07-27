@@ -54,6 +54,7 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
     while (true) {
         messages = await ai.next(messages, userInput, currFn());
         let msg = messages[messages.length - 1]?.content.trim();
+        console.log(msg)
         if (msg === 'Nothing more to clarify.') {
             break;
         }

@@ -93,7 +93,8 @@ export class AI {
             console.log("LLM not initialised");
             return []
         }
-        
+        try {
+            
         let response = await this.llm.call(messages);  // type: ignore
         messages.push(response);
 
@@ -102,6 +103,11 @@ export class AI {
         );
 
         return messages;
+        } catch (error) {
+            console.log(error);
+            return []
+        }
+
     }
 
     static serializeMessages(messages: Message[] | void): string {
@@ -112,16 +118,16 @@ export class AI {
     }
 
     static deserializeMessages(jsondictstr: string): Message[] {
-        const msgs =  JSON.parse(jsondictstr).map((m: any) => {
+        const msgs = JSON.parse(jsondictstr).map((m: any) => {
             if (m.id.includes("SystemMessage")) {
-                return new SystemMessage(m)  
+                return new SystemMessage(m)
             } else if (m.id.includes("AIMessage")) {
-                return new AIMessage(m)  
+                return new AIMessage(m)
             } else {
                 return new SystemMessage(m);
             }
         });
-        return  msgs;  // type: ignore
+        return msgs;  // type: ignore
     }
 
     update_token_usage_log(
@@ -195,15 +201,15 @@ export async function fallbackModel(model: string): Promise<string> {
         console.log('error with model ', model);
 
     }
-    return "gpt-3.5-turbo";
+    return "gpt-3.5-turbo-16k";
 }
 
 function createChatModel(model: string, temperature: number): BaseChatModel {
     switch (model) {
         case 'gpt-4':
-            return new ChatOpenAI({ modelName: 'gpt-4', temperature }
-
-            );
+            return new ChatOpenAI({ modelName: 'gpt-4', temperature });
+        case 'gpt-3.5-turbo-16k':
+            return new ChatOpenAI({ modelName: 'gpt-3.5-turbo-16k', temperature });
         case 'gpt-3.5-turbo':
             return new ChatOpenAI({ modelName: 'gpt-3.5-turbo', temperature }
             );
@@ -214,6 +220,9 @@ function createChatModel(model: string, temperature: number): BaseChatModel {
 
 function get_tokenizer(model: string) {
     // Implementation here
+    if (model === "gpt-3.5-turbo-16k") {
+        return encoding_for_model('gpt-3.5-turbo');
+    }
     return encoding_for_model(model as any)
 }
 
