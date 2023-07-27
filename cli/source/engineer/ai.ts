@@ -93,8 +93,6 @@ export class AI {
             console.log("LLM not initialised");
             return []
         }
-        console.log(messages, "messages");
-        console.log(prompt, "prompt");
         
         let response = await this.llm.call(messages);  // type: ignore
         messages.push(response);
@@ -108,13 +106,22 @@ export class AI {
 
     static serializeMessages(messages: Message[] | void): string {
         if (!messages) {
-            return "";
+            return "[]";
         }
         return JSON.stringify(messages);
     }
 
     static deserializeMessages(jsondictstr: string): Message[] {
-        return JSON.parse(jsondictstr);  // type: ignore
+        const msgs =  JSON.parse(jsondictstr).map((m: any) => {
+            if (m.id.includes("SystemMessage")) {
+                return new SystemMessage(m)  
+            } else if (m.id.includes("AIMessage")) {
+                return new AIMessage(m)  
+            } else {
+                return new SystemMessage(m);
+            }
+        });
+        return  msgs;  // type: ignore
     }
 
     update_token_usage_log(

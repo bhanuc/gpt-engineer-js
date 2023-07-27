@@ -61,7 +61,6 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
             console.log('Nothing more to clarify.');
             break;
         }
-        console.log(msg, "in clarify");
         userInput =( await inquirer.prompt([{
             type: 'input',
             name: 'userInput',
