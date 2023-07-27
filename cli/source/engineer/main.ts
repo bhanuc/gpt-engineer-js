@@ -5,9 +5,15 @@ import { collectLearnings } from './collect.js';
 import { DB, DBs, archive } from './db.js';
 import { collectConsent } from './learning.js';
 import { STEPS, Config as StepsConfig } from './steps.js';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export async function Main({
-    projectPath = "projects/example",
+    projectPath,
     model = "gpt-4",
     temperature = 0.1,
     stepsConfig= StepsConfig.DEFAULT,
@@ -15,17 +21,19 @@ export async function Main({
 ): Promise<void> {
     // Implement logging here...
     // console.log(verbose);
-    
+    if (!projectPath) {
+        return console.log('Project path not selected. Exiting')
+    }
 
     model = await fallbackModel(model);
     let ai = new AI(model, temperature);
             await ai.initAI();
     let inputPath = path.resolve(projectPath);
-    let promptPath = path.resolve('./preprompts');
+    let promptPath = path.resolve(__dirname, '../../preprompts');
     let memoryPath = path.join(inputPath, "memory");
     let workspacePath = path.join(inputPath, "workspace");
     let archivePath = path.join(inputPath, "archive");    
-
+    
     let dbs = new DBs(
         new DB(memoryPath),
         new DB(path.join(memoryPath, "logs")),
