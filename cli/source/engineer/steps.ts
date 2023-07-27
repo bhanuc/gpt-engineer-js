@@ -35,7 +35,7 @@ function getPrompt(dbs: DBs): string {
     //     return dbs.input['main_prompt'] as string;
     // }
 
-    return dbs.preprompts.get('prompt') as string;
+    return dbs.input.get('prompt') as string;
 }
 
 // This assumes the AI class and its methods are defined with the same interface in TypeScript
