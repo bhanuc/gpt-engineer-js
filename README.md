@@ -26,7 +26,7 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 Choose either **stable** or **development**.
 
 For **stable** release:
-  - coming soon
+  - npx gpt-engineer
 
 For **development**:
   - coming soon

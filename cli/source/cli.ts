@@ -1,9 +1,10 @@
+#!/usr/bin/env node
 
 import { Main } from './engineer/main.js';
 
 (async () => {
     try {
-        const app = await Main({ projectPath : "../projects/example"})
+        const app = await Main({ projectPath : process.cwd()})
         console.log(app, "app");
 
     } catch (error: any) {
