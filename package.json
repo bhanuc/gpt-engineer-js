@@ -17,8 +17,13 @@
 		"dist"
 	],
 	"dependencies": {
+		"@dqbd/tiktoken": "^1.0.7",
+		"date-fns": "^2.30.0",
 		"fs-extra": "^11.1.1",
-		"inquirer": "^9.2.8"
+		"inquirer": "^9.2.8",
+		"langchain": "^0.0.121",
+		"mkdirp": "^3.0.1",
+		"openai": "^3.3.0"
 	},
 	"devDependencies": {
 		"@sindresorhus/tsconfig": "^3.0.1",

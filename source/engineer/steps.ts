@@ -156,13 +156,14 @@ async function genSpec(ai: AI, dbs: DBs): Promise<Message[]> {
 	];
 
 	const messagesAfterNext = await ai.next(messages, dbs.preprompts.get('spec'), currFn());
-
-	dbs.memory.set('specification', messagesAfterNext[messagesAfterNext.length - 1].content.trim());
-
+	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
+	if (msg) {
+		dbs.memory.set('specification', msg);
+	}
 	return messagesAfterNext;
 }
 
-async function genCode(ai: AI, dbs: DBs): Promise<Message[]> {
+export async function genCode(ai: AI, dbs: DBs): Promise<Message[]> {
 	const messages = [
 		ai.fsystem(setupSysPrompt(dbs)),
 		ai.fuser(`Instructions: ${dbs.input.get('prompt')}`),
@@ -171,8 +172,10 @@ async function genCode(ai: AI, dbs: DBs): Promise<Message[]> {
 	];
 
 	const messagesAfterNext = await ai.next(messages, dbs.preprompts.get('use_qa'), currFn());
-	toFiles(messagesAfterNext[messagesAfterNext.length - 1].content.trim(), dbs.workspace);
-
+	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
+	if (msg) {
+		toFiles(msg, dbs.workspace);
+	}
 	return messagesAfterNext;
 }
 
@@ -189,18 +192,21 @@ async function respec(ai: AI, dbs: DBs): Promise<Message[]> {
 		"specification word by word again.",
 		currFn(),
 	);
+	let msg = messages[messages.length - 1]?.content.trim();
+	if (msg) {
+		dbs.memory.set('specification', msg);
+	}
 
-	dbs.memory.set('specification', messages[messages.length - 1].content.trim());
 	return messages;
 }
 
 async function fixCode(ai: AI, dbs: DBs): Promise<Message[]> {
 	const previousMessages = AI.deserializeMessages(dbs.logs.get(genCode.name));
-	const codeOutput = previousMessages[previousMessages.length - 1].content.trim();
+	const codeOutput = previousMessages[previousMessages.length - 1]?.content.trim();
 	const messages = [
 		ai.fsystem(setupSysPrompt(dbs)),
 		ai.fuser(`Instructions: ${dbs.input.get('prompt')}`),
-		ai.fuser(codeOutput),
+		ai.fuser(codeOutput || ""),
 		ai.fsystem(dbs.preprompts.get('fix_code')),
 	];
 
@@ -209,8 +215,11 @@ async function fixCode(ai: AI, dbs: DBs): Promise<Message[]> {
 		"Please fix any errors in the code above.",
 		currFn()
 	);
+	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
+	if (msg) {
+		toFiles(msg, dbs.workspace);
+	}
 
-	toFiles(messagesAfterNext[messagesAfterNext.length - 1].content.trim(), dbs.workspace);
 
 	return messagesAfterNext;
 }
@@ -224,7 +233,10 @@ async function useFeedback(ai: AI, dbs: DBs): Promise<Message[]> {
 	];
 
 	const messagesAfterNext = await ai.next(messages, dbs.input.get('feedback'), currFn());
-	toFiles(messagesAfterNext[messagesAfterNext.length - 1].content.trim(), dbs.workspace);
+	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
+	if (msg) {
+		toFiles(msg, dbs.workspace);
+	}
 
 	return messagesAfterNext;
 }
@@ -237,8 +249,10 @@ async function genUnitTests(ai: AI, dbs: DBs): Promise<Message[]> {
 	];
 
 	const messagesAfterNext = await ai.next(messages, dbs.preprompts.get('unit_tests'), currFn());
-
-	dbs.memory.set('unit_tests', messagesAfterNext[messagesAfterNext.length - 1].content.trim());
+	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
+	if (msg) {
+		dbs.memory.set('unit_tests', msg);
+	}
 	toFiles(dbs.memory.get('unit_tests'), dbs.workspace);
 
 	return messagesAfterNext;
