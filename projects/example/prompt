@@ -1,1 +1,1 @@
-We are writing snake in python. MVC components split in separate files. Keyboard control.
+We are writing snake game in javascript using react.js. Snake can be controlled using keyboard arrows and snake grows by eating random fruits that spawn at random places. You need to prevent crashing snake into itself and your score is equal to the length of the snake. UI would consist of a simple 2d reactangular walls which also needs to be avoided.

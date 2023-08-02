@@ -1,6 +1,6 @@
 import { exec } from "child_process";
-import { AI, Message } from "./ai.js"; 
-import { DBs} from "./db.js";
+import { AI, Message } from "./ai.js";
+import { DBs } from "./db.js";
 import { humanInput } from "./learning.js";
 import { toFiles } from "./chat_to_files.js";
 import inquirer from "inquirer";
@@ -24,7 +24,7 @@ function currFn(): string {
 }
 
 function getPrompt(dbs: DBs): string {
-    
+
     // if (!('prompt' in dbs.input) && !('main_prompt' in dbs.input)) {
     //     throw new Error('Please put your prompt in the file `prompt` in the project directory');
     // }
@@ -39,11 +39,11 @@ function getPrompt(dbs: DBs): string {
 }
 
 // This assumes the AI class and its methods are defined with the same interface in TypeScript
-async function simpleGen(ai: AI, dbs: DBs): Promise <Message[]> {
+async function simpleGen(ai: AI, dbs: DBs): Promise<Message[]> {
     const messages = await ai.start(setupSysPrompt(dbs), getPrompt(dbs), currFn());
     let msg = messages[messages.length - 1]?.content.trim();
     if (msg) {
-    toFiles(msg, dbs.workspace);
+        toFiles(msg, dbs.workspace);
     }
     return messages;
 }
@@ -53,7 +53,7 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
     let userInput = getPrompt(dbs);
 
     while (true) {
-        messages = await ai.next(messages,  currFn(), userInput);
+        messages = await ai.next(messages, currFn(), userInput);
         let msg = messages[messages.length - 1]?.content.trim();
         console.log(msg)
         if (msg === 'Nothing more to clarify.') {
@@ -63,11 +63,12 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
             console.log('Nothing more to clarify.');
             break;
         }
-        userInput =( await inquirer.prompt([{
+        userInput = (await inquirer.prompt([{
             type: 'input',
             name: 'userInput',
-            message:`(answer in text, or "c" to move on)\n`}])).userInput;
- 
+            message: `(answer in text, or "c" to move on)\n`
+        }])).userInput;
+
         console.log();
         if (!userInput || userInput === 'c') {
             console.log('(letting gpt-engineer make its own assumptions)');
@@ -103,10 +104,10 @@ async function genClarifiedCode(ai: AI, dbs: DBs): Promise<Message[]> {
         ai.fsystem(setupSysPrompt(dbs)),
         ...messages.slice(1)
     ];
-    messages = await ai.next(messages,  currFn(), dbs.preprompts.get('use_qa'));
+    messages = await ai.next(messages, currFn(), dbs.preprompts.get('use_qa'));
     let msg = messages[messages.length - 1]?.content.trim();
-    if(msg ) {
-        toFiles( msg, dbs.workspace);
+    if (msg) {
+        toFiles(msg, dbs.workspace);
     }
 
     return messages;
@@ -134,15 +135,15 @@ async function genEntrypoint(ai: AI, dbs: DBs): Promise<Message[]> {
     let regex = /```\S*\n(.+?)```/gs;
     let msg = messages[messages.length - 1]?.content.trim();
     if (msg) {
-    let matches = Array.from(msg.matchAll(regex));
-    dbs.workspace.set("run.sh", matches.map(match => match[1]).join("\n"));
-        
+        let matches = Array.from(msg.matchAll(regex));
+        dbs.workspace.set("run.sh", matches.map(match => match[1]).join("\n"));
+        toFiles(msg, dbs.workspace);
     }
 
     return messages;
 }
 
-async function humanReview( _ai: AI,dbs: DBs): Promise<void> {
+async function humanReview(_ai: AI, dbs: DBs): Promise<void> {
     let review = await humanInput();
     dbs.memory.set("review", JSON.stringify(review));
 }
@@ -153,15 +154,16 @@ export const STEPS = {
     [Config.SIMPLE]: [simpleGen, genEntrypoint, executeEntrypoint],
 };
 
-async function executeEntrypoint(_ai: AI, dbs: DBs): Promise <Message[]> {
+async function executeEntrypoint(_ai: AI, dbs: DBs): Promise<Message[]> {
     const command = dbs.workspace.get('run.sh');
 
     console.log('Do you want to execute this code?');
     console.log(command);
-    const userInput  =( await inquirer.prompt([{
+    const userInput = (await inquirer.prompt([{
         type: 'input',
         name: 'userInput',
-        message:'(answer in complete text, or "c" to move on)\n'}])).userInput;
+        message: '(answer in complete text, or "c" to move on)\n'
+    }])).userInput;
     if (!['', 'y', 'yes'].includes(userInput)) {
         console.log('Ok, not executing the code.');
         return [];
