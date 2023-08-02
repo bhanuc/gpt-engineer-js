@@ -94,15 +94,15 @@ export class AI {
             return []
         }
         try {
-            
-        let response = await this.llm.call(messages);  // type: ignore
-        messages.push(response);
 
-        this.update_token_usage_log(
-            messages, response.content, step_name
-        );
+            let response = await this.llm.call(messages);  // type: ignore
+            messages.push(response);
 
-        return messages;
+            this.update_token_usage_log(
+                messages, response.content, step_name
+            );
+
+            return messages;
         } catch (error) {
             console.log(error);
             return []
@@ -120,11 +120,11 @@ export class AI {
     static deserializeMessages(jsondictstr: string): Message[] {
         const msgs = JSON.parse(jsondictstr).map((m: any) => {
             if (m.id.includes("SystemMessage")) {
-                return new SystemMessage(m)
+                return new SystemMessage(m.kwargs.content)
             } else if (m.id.includes("AIMessage")) {
-                return new AIMessage(m)
+                return new AIMessage(m.kwargs.content)
             } else {
-                return new SystemMessage(m);
+                return new SystemMessage(m.kwargs.content);
             }
         });
         return msgs;  // type: ignore
