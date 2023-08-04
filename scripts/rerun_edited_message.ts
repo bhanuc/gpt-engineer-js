@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { AI } from '../source/engineer/ai.js';
-import { toFiles } from '../source/engineer/chat_to_files.js';
-import { DB } from '../source/engineer/db.js';
+import {AI} from '../source/engineer/ai.js';
+import {toFiles} from '../source/engineer/chat_to_files.js';
+import {DB} from '../source/engineer/db.js';
 
 // interface AIOptions {
 //   model_name: string;
@@ -23,23 +23,23 @@ import { DB } from '../source/engineer/db.js';
 // }
 
 export async function main(
-  messagesPath: string,
-  outPath: string | null = null,
-  model: string = 'gpt-4',
-  temperature: number = 0.1
+	messagesPath: string,
+	outPath: string | null = null,
+	model: string = 'gpt-4',
+	temperature: number = 0.1,
 ): Promise<void> {
-  const ai = new AI( model, temperature);
+	const ai = new AI(model, temperature);
 
-  const messages = JSON.parse(fs.readFileSync(messagesPath, 'utf8'));
-  const processedMessages = await ai.next(messages,"");
+	const messages = JSON.parse(fs.readFileSync(messagesPath, 'utf8'));
+	const processedMessages = await ai.next(messages, '');
 	const msg = processedMessages[processedMessages.length - 1];
-  if (outPath && msg) {
-    toFiles(msg['content'], new DB(outPath));
-    fs.writeFileSync(
-      path.join(outPath, 'all_output.txt'),
-      JSON.stringify(msg['content'])
-    );
-  }
+	if (outPath && msg) {
+		toFiles(msg['content'], new DB(outPath));
+		fs.writeFileSync(
+			path.join(outPath, 'all_output.txt'),
+			JSON.stringify(msg['content']),
+		);
+	}
 }
 
 // Call the main function if this script is run directly

@@ -1,22 +1,21 @@
-import { exec } from "child_process";
-import { AI, Message } from "./ai.js";
-import { DBs } from "./db.js";
-import { humanInput } from "./learning.js";
-import { toFiles } from "./chat_to_files.js";
-import inquirer from "inquirer";
-
+import {exec} from 'child_process';
+import {AI, Message} from './ai.js';
+import {DBs} from './db.js';
+import {humanInput} from './learning.js';
+import {toFiles} from './chat_to_files.js';
+import inquirer from 'inquirer';
 
 export enum Config {
-	DEFAULT = "default",
-	BENCHMARK = "benchmark",
-	SIMPLE = "simple",
-	TDD = "tdd",
-	TDD_PLUS = "tdd+",
-	CLARIFY = "clarify",
-	RESPEC = "respec",
-	EXECUTE_ONLY = "execute_only",
-	EVALUATE = "evaluate",
-	USE_FEEDBACK = "use_feedback"
+	DEFAULT = 'default',
+	BENCHMARK = 'benchmark',
+	SIMPLE = 'simple',
+	TDD = 'tdd',
+	TDD_PLUS = 'tdd+',
+	CLARIFY = 'clarify',
+	RESPEC = 'respec',
+	EXECUTE_ONLY = 'execute_only',
+	EVALUATE = 'evaluate',
+	USE_FEEDBACK = 'use_feedback',
 }
 function currFn(): string {
 	const err = new Error();
@@ -24,7 +23,6 @@ function currFn(): string {
 }
 
 function getPrompt(dbs: DBs): string {
-
 	// if (!('prompt' in dbs.input) && !('main_prompt' in dbs.input)) {
 	//     throw new Error('Please put your prompt in the file `prompt` in the project directory');
 	// }
@@ -40,7 +38,11 @@ function getPrompt(dbs: DBs): string {
 
 // This assumes the AI class and its methods are defined with the same interface in TypeScript
 async function simpleGen(ai: AI, dbs: DBs): Promise<Message[]> {
-	const messages = await ai.start(setupSysPrompt(dbs), getPrompt(dbs), currFn());
+	const messages = await ai.start(
+		setupSysPrompt(dbs),
+		getPrompt(dbs),
+		currFn(),
+	);
 	let msg = messages[messages.length - 1]?.content.trim();
 	if (msg) {
 		toFiles(msg, dbs.workspace);
@@ -55,7 +57,7 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
 	while (true) {
 		messages = await ai.next(messages, currFn(), userInput);
 		let msg = messages[messages.length - 1]?.content.trim();
-		console.log(msg)
+		console.log(msg);
 		if (msg === 'Nothing more to clarify.') {
 			break;
 		}
@@ -63,11 +65,15 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
 			console.log('Nothing more to clarify.');
 			break;
 		}
-		userInput = (await inquirer.prompt([{
-			type: 'input',
-			name: 'userInput',
-			message: `(answer in text, or "c" to move on)\n`
-		}])).userInput;
+		userInput = (
+			await inquirer.prompt([
+				{
+					type: 'input',
+					name: 'userInput',
+					message: `(answer in text, or "c" to move on)\n`,
+				},
+			])
+		).userInput;
 
 		console.log();
 		if (!userInput || userInput === 'c') {
@@ -81,29 +87,29 @@ async function clarify(ai: AI, dbs: DBs): Promise<Message[]> {
 			console.log();
 			return messages;
 		}
-		userInput += (
+		userInput +=
 			'\n\n' +
 			'Is anything else unclear? If yes, only answer in the form:\n' +
 			'{remaining unclear areas} remaining questions.\n' +
 			'{Next question}\n' +
-			'If everything is sufficiently clear, only answer "Nothing more to clarify.".'
-		);
+			'If everything is sufficiently clear, only answer "Nothing more to clarify.".';
 	}
 	console.log();
 	return messages;
 }
 
 function setupSysPrompt(dbs: DBs): string {
-	return dbs.preprompts.get("generate") + "\nUseful to know:\n" + dbs.preprompts.get("philosophy");
+	return (
+		dbs.preprompts.get('generate') +
+		'\nUseful to know:\n' +
+		dbs.preprompts.get('philosophy')
+	);
 }
 
 async function genClarifiedCode(ai: AI, dbs: DBs): Promise<Message[]> {
 	let messages: Message[] = AI.deserializeMessages(dbs.logs.get('clarify'));
 
-	messages = [
-		ai.fsystem(setupSysPrompt(dbs)),
-		...messages.slice(1)
-	];
+	messages = [ai.fsystem(setupSysPrompt(dbs)), ...messages.slice(1)];
 	messages = await ai.next(messages, currFn(), dbs.preprompts.get('use_qa'));
 	let msg = messages[messages.length - 1]?.content.trim();
 	if (msg) {
@@ -113,21 +119,20 @@ async function genClarifiedCode(ai: AI, dbs: DBs): Promise<Message[]> {
 	return messages;
 }
 
-
 async function genEntrypoint(ai: AI, dbs: DBs): Promise<Message[]> {
 	let messages: Message[] = await ai.start(
-		"You will get information about a codebase that is currently on disk in " +
-		"the current folder.\n" +
-		"From this you will answer with code blocks that includes all the necessary " +
-		"unix terminal commands to " +
-		"a) install dependencies " +
-		"b) run all necessary parts of the codebase (in parallel if necessary).\n" +
-		"Do not install globally. Do not use sudo.\n" +
-		"Do not explain the code, just give the commands.\n" +
-		"Do not use placeholders, use example values (like . for a folder argument) " +
-		"if necessary.\n",
-		"Information about the codebase:\n\n" + dbs.workspace.get("all_output.txt"),
-		currFn()
+		'You will get information about a codebase that is currently on disk in ' +
+			'the current folder.\n' +
+			'From this you will answer with code blocks that includes all the necessary ' +
+			'unix terminal commands to ' +
+			'a) install dependencies ' +
+			'b) run all necessary parts of the codebase (in parallel if necessary).\n' +
+			'Do not install globally. Do not use sudo.\n' +
+			'Do not explain the code, just give the commands.\n' +
+			'Do not use placeholders, use example values (like . for a folder argument) ' +
+			'if necessary.\n',
+		'Information about the codebase:\n\n' + dbs.workspace.get('all_output.txt'),
+		currFn(),
 	);
 
 	console.log();
@@ -136,7 +141,10 @@ async function genEntrypoint(ai: AI, dbs: DBs): Promise<Message[]> {
 	let msg = messages[messages.length - 1]?.content.trim();
 	if (msg) {
 		let matches = Array.from(msg.matchAll(regex));
-		dbs.workspace.set("run.sh", matches.map((match: any) => match[1]).join("\n"));
+		dbs.workspace.set(
+			'run.sh',
+			matches.map((match: any) => match[1]).join('\n'),
+		);
 		toFiles(msg, dbs.workspace);
 	}
 
@@ -145,9 +153,8 @@ async function genEntrypoint(ai: AI, dbs: DBs): Promise<Message[]> {
 
 async function humanReview(_ai: AI, dbs: DBs): Promise<void> {
 	let review = await humanInput();
-	dbs.memory.set("review", JSON.stringify(review));
+	dbs.memory.set('review', JSON.stringify(review));
 }
-
 
 async function genSpec(ai: AI, dbs: DBs): Promise<Message[]> {
 	const messages = [
@@ -155,7 +162,11 @@ async function genSpec(ai: AI, dbs: DBs): Promise<Message[]> {
 		ai.fsystem(`Instructions: ${dbs.input.get('prompt')}`),
 	];
 
-	const messagesAfterNext = await ai.next(messages, dbs.preprompts.get('spec'), currFn());
+	const messagesAfterNext = await ai.next(
+		messages,
+		dbs.preprompts.get('spec'),
+		currFn(),
+	);
 	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
 	if (msg) {
 		dbs.memory.set('specification', msg);
@@ -171,7 +182,11 @@ export async function genCode(ai: AI, dbs: DBs): Promise<Message[]> {
 		ai.fuser(`Unit tests:\n\n${dbs.memory.get('unit_tests')}`),
 	];
 
-	const messagesAfterNext = await ai.next(messages, dbs.preprompts.get('use_qa'), currFn());
+	const messagesAfterNext = await ai.next(
+		messages,
+		dbs.preprompts.get('use_qa'),
+		currFn(),
+	);
 	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
 	if (msg) {
 		toFiles(msg, dbs.workspace);
@@ -186,10 +201,10 @@ async function respec(ai: AI, dbs: DBs): Promise<Message[]> {
 	messages = await ai.next(messages, currFn());
 	messages = await ai.next(
 		messages,
-		"Based on the conversation so far, please reiterate the specification for " +
-		"the program. If there are things that can be improved, please incorporate the " +
-		"improvements. If you are satisfied with the specification, just write out the " +
-		"specification word by word again.",
+		'Based on the conversation so far, please reiterate the specification for ' +
+			'the program. If there are things that can be improved, please incorporate the ' +
+			'improvements. If you are satisfied with the specification, just write out the ' +
+			'specification word by word again.',
 		currFn(),
 	);
 	let msg = messages[messages.length - 1]?.content.trim();
@@ -202,24 +217,24 @@ async function respec(ai: AI, dbs: DBs): Promise<Message[]> {
 
 async function fixCode(ai: AI, dbs: DBs): Promise<Message[]> {
 	const previousMessages = AI.deserializeMessages(dbs.logs.get(genCode.name));
-	const codeOutput = previousMessages[previousMessages.length - 1]?.content.trim();
+	const codeOutput =
+		previousMessages[previousMessages.length - 1]?.content.trim();
 	const messages = [
 		ai.fsystem(setupSysPrompt(dbs)),
 		ai.fuser(`Instructions: ${dbs.input.get('prompt')}`),
-		ai.fuser(codeOutput || ""),
+		ai.fuser(codeOutput || ''),
 		ai.fsystem(dbs.preprompts.get('fix_code')),
 	];
 
 	const messagesAfterNext = await ai.next(
 		messages,
-		"Please fix any errors in the code above.",
-		currFn()
+		'Please fix any errors in the code above.',
+		currFn(),
 	);
 	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
 	if (msg) {
 		toFiles(msg, dbs.workspace);
 	}
-
 
 	return messagesAfterNext;
 }
@@ -232,7 +247,11 @@ async function useFeedback(ai: AI, dbs: DBs): Promise<Message[]> {
 		ai.fsystem(dbs.preprompts.get('use_feedback')),
 	];
 
-	const messagesAfterNext = await ai.next(messages, dbs.input.get('feedback'), currFn());
+	const messagesAfterNext = await ai.next(
+		messages,
+		dbs.input.get('feedback'),
+		currFn(),
+	);
 	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
 	if (msg) {
 		toFiles(msg, dbs.workspace);
@@ -248,7 +267,11 @@ async function genUnitTests(ai: AI, dbs: DBs): Promise<Message[]> {
 		ai.fuser(`Specification:\n\n${dbs.memory.get('specification')}`),
 	];
 
-	const messagesAfterNext = await ai.next(messages, dbs.preprompts.get('unit_tests'), currFn());
+	const messagesAfterNext = await ai.next(
+		messages,
+		dbs.preprompts.get('unit_tests'),
+		currFn(),
+	);
 	let msg = messagesAfterNext[messagesAfterNext.length - 1]?.content.trim();
 	if (msg) {
 		dbs.memory.set('unit_tests', msg);
@@ -259,7 +282,13 @@ async function genUnitTests(ai: AI, dbs: DBs): Promise<Message[]> {
 }
 
 export const STEPS = {
-	[Config.DEFAULT]: [clarify, genClarifiedCode, genEntrypoint, executeEntrypoint, humanReview],
+	[Config.DEFAULT]: [
+		clarify,
+		genClarifiedCode,
+		genEntrypoint,
+		executeEntrypoint,
+		humanReview,
+	],
 	[Config.BENCHMARK]: [simpleGen, genEntrypoint],
 	[Config.SIMPLE]: [simpleGen, genEntrypoint, executeEntrypoint],
 	[Config.TDD]: [
@@ -296,7 +325,12 @@ export const STEPS = {
 		executeEntrypoint,
 		humanReview,
 	],
-	[Config.USE_FEEDBACK]: [useFeedback, genEntrypoint, executeEntrypoint, humanReview],
+	[Config.USE_FEEDBACK]: [
+		useFeedback,
+		genEntrypoint,
+		executeEntrypoint,
+		humanReview,
+	],
 	[Config.EXECUTE_ONLY]: [executeEntrypoint],
 	[Config.EVALUATE]: [executeEntrypoint, humanReview],
 };
@@ -306,17 +340,21 @@ async function executeEntrypoint(_ai: AI, dbs: DBs): Promise<Message[]> {
 
 	console.log('Do you want to execute this code?');
 	console.log(command);
-	const userInput = (await inquirer.prompt([{
-		type: 'input',
-		name: 'userInput',
-		message: '(answer in complete text, or "c" to move on)\n'
-	}])).userInput;
+	const userInput = (
+		await inquirer.prompt([
+			{
+				type: 'input',
+				name: 'userInput',
+				message: '(answer in complete text, or "c" to move on)\n',
+			},
+		])
+	).userInput;
 	if (!['', 'y', 'yes'].includes(userInput)) {
 		console.log('Ok, not executing the code.');
 		return [];
 	}
 	console.log('Executing the code...');
-	exec(command, { cwd: dbs.workspace.path }, (error, stdout, stderr) => {
+	exec(command, {cwd: dbs.workspace.path}, (error, stdout, stderr) => {
 		if (error) {
 			console.error(`exec error: ${error}`);
 			return;

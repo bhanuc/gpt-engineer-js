@@ -7,7 +7,7 @@ python scripts/benchmark.py
 ## 2023-06-21
 
 | Benchmark          | Ran | Works | Perfect |
-|--------------------|-----|-------|---------|
+| ------------------ | --- | ----- | ------- |
 | currency_converter | ✅  | ❌    | ❌      |
 | image_resizer      | ✅  | ✅    | ✅      |
 | pomodoro_timer     | ✅  | ✅    | ✅      |
@@ -34,7 +34,7 @@ One error is that a dependency was used incorrectly and easy to fix
 ## 2023-06-19
 
 | Benchmark          | Ran | Works | Perfect |
-|--------------------|-----|-------|---------|
+| ------------------ | --- | ----- | ------- |
 | currency_converter | ❌  | ❌    | ❌      |
 | image_resizer      | ✅  | ❌    | ❌      |
 | pomodoro_timer     | ❌  | ❌    | ❌      |
@@ -67,7 +67,7 @@ Uncaught ReferenceError: module is not defined
 - failure mode: placeholder text
 
 url_shortener starts but gets the error:
-  SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 8636125824 and this is thread id 13021003776.
+SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 8636125824 and this is thread id 13021003776.
 
 markdown_editor:
 failing tests, 'WebDriver' object has no attribute 'find_element_by_id'

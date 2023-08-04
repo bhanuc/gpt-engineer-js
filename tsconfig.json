@@ -1,8 +1,12 @@
 {
 	"extends": "@sindresorhus/tsconfig",
+
 	"compilerOptions": {
+		"allowJs": true,
+		// "target": "ES5",
+		"module": "ESNext",
 		"outDir": "dist",
-		"types": ["node", "jest"]
+		"types": ["node"]
 	},
 	"include": ["source", "tests", "scripts"]
 }

@@ -1,6 +1,7 @@
 # Roadmap
 
 There are three main milestones we believe will greatly increase gpt-engineer's reliability and capability:
+
 - [x] Continuous evaluation of our progress 🎉
 - [ ] Test code and fix errors with LLMs
 - [ ] Make code generation become small, verifiable steps
@@ -24,22 +25,26 @@ There are three main milestones we believe will greatly increase gpt-engineer's 
   - [ ] Integrate Aider
 
 ## Experimental research
+
 This is not our current focus, but if you are interested in experimenting: Please
 create a thread in Discord #general and share your intentions and your findings as you
 go along. High impact examples:
+
 - [ ] **Make code generation become small, verifiable steps**
   - [ ] Ask GPT4 to decide how to sequence the entire generation, and do one
-  prompt for each subcomponent
+        prompt for each subcomponent
   - [ ] For each small part, generate tests for that subpart, and do the loop of running the tests for each part, feeding
-results into GPT4, and let it edit the code until they pass
+        results into GPT4, and let it edit the code until they pass
 - [ ] **Ad hoc experiments**
   - [ ] Try Microsoft guidance, and benchmark if this helps improve performance
   - [ ] Dynamic planning: Let gpt-engineer plan which "steps" to carry out itself, depending on the
-task, by giving it few shot example of what are usually "the right-sized steps" to carry
-out for such projects
+        task, by giving it few shot example of what are usually "the right-sized steps" to carry
+        out for such projects
 
 ## Codebase improvements
+
 By improving the codebase and developer ergonomics, we accelerate progress. Some examples:
+
 - [ ] Set up automatic PR review for all PRs with e.g. Codium pr-agent
 - [ ] LLM tests in CI: Run super small tests with GPT3.5 in CI, that check that simple code generation still works
 
