@@ -1,9 +1,4 @@
-# GPT Engineer port in Typescript
-
-[![Discord Follow](https://dcbadge.vercel.app/api/server/8tcDQ89Ej2?style=flat)](https://discord.gg/8tcDQ89Ej2)
-[![GitHub Repo stars](https://img.shields.io/github/stars/AntonOsika/gpt-engineer?style=social)](https://github.com/AntonOsika/gpt-engineer)
-[![Twitter Follow](https://img.shields.io/twitter/follow/antonosika?style=social)](https://twitter.com/AntonOsika)
-
+# GPT-Engineer.js
 
 **Specify what you want it to build, the AI asks for clarification, and then builds it.**
 
@@ -26,10 +21,13 @@ GPT Engineer is made to be easy to adapt, extend, and make your agent learn how 
 Choose either **stable** or **development**.
 
 For **stable** release:
-  - npx gpt-engineer
+
+- npx gpt-engineer
 
 For **development**:
-  - coming soon
+
+- npm run dev
+  - node dist/cli.js
 
 **Setup**
 
@@ -50,14 +48,12 @@ To set API key on windows check the [Windows README](.github/WINDOWS_README.md).
 By running gpt-engineer you agree to our [terms](https://github.com/AntonOsika/gpt-engineer/blob/main/TERMS_OF_USE.md).
 
 **Results**
-- Check the generated files in `projects/my-new-project/workspace`
 
+- Check the generated files in `projects/my-new-project/workspace`
 
 To **run in the browser** you can simply:
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/AntonOsika/gpt-engineer/codespaces)
-
-
 
 ## Features
 
@@ -68,9 +64,11 @@ Editing the `preprompts`, and evolving how you write the project prompt, is how 
 Each step in `steps.py` will have its communication history with GPT4 stored in the logs folder, and can be rerun with `scripts/rerun_edited_message_logs.py`.
 
 ## Credits
-Based on the implementaion of [GPT-Engineer](https://github.com/AntonOsika/gpt-engineer) . More details will be added soon.
 
+Based on the implementaion of [GPT-Engineer](https://github.com/AntonOsika/gpt-engineer) . More details will be added soon.
 
 ## Example
 
 https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
+
+> Port of [GPT-Engineer](https://github.com/AntonOsika/gpt-engineer) in typescript. Refer to the original repo for documentation. More details will be added here.
