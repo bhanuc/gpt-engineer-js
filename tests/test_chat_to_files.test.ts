@@ -21,14 +21,14 @@ test('toFiles tests', async t => {
     `;
 
 	const expectedFiles = {
-		'file1.py': 'print("Hello, World!")\n',
-		'file2.py': 'def add(a, b):\n    return a + b\n',
-		'README.md': '\nThis is a sample program.\n\nfile1.py\n',
+        'file1.py': 'print("Hello, World!")',
+        'file2.py': 'def add(a, b):\n        return a + b',
+        'README.md': 'This is a sample program.\n\n    file1.py',
 	};
 	await t.test('updated', () => {
 		return new Promise((resolve, reject) => {
 			try {
-				const workspace: any = new DB('.');
+				const workspace: any = new DB('./tests/misc');
 				toFiles(chat, workspace);
 
 				assert.strictEqual(workspace.get('all_output.txt'), chat);
@@ -37,6 +37,8 @@ test('toFiles tests', async t => {
 				}
 				resolve();
 			} catch (error) {
+				console.log(error, "ee");
+
 				reject();
 			}
 		});

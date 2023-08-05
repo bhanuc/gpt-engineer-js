@@ -72,3 +72,5 @@ Based on the implementaion of [GPT-Engineer](https://github.com/AntonOsika/gpt-e
 https://github.com/AntonOsika/gpt-engineer/assets/4467025/6e362e45-4a94-4b0d-973d-393a31d92d9b
 
 > Port of [GPT-Engineer](https://github.com/AntonOsika/gpt-engineer) in typescript. Refer to the original repo for documentation. More details will be added here.
+
+Note: Tests are written using native node.js test runner and require node version >20. Actual CLI should work on node.js >12.
