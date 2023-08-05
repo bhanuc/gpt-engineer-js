@@ -1,15 +1,12 @@
-// import * as rudder_analytics from 'rudders/tack.analytics';
-import {DB, DBs} from '../source/engineer/db.js';
-import {collectLearnings} from '../source/engineer/collect.js';
-// import {Learning, extractLearning} from '../source/engineer/learning.js';
-import {genCode} from '../source/engineer/steps.js';
 import assert from 'node:assert';
-import {mock, test} from 'node:test';
+import { test} from 'node:test';
+import {DB, DBs} from '../source/engineer/db.js';
+import {genCode} from '../source/engineer/steps.js';
+import { extractLearning } from '../source/engineer/learning.js';
 
 test('collect_learnings tests', async t => {
 	await t.test('No process.env is set, error gets thrown', async () => {
 		process.env['COLLECT_LEARNINGS_OPT_IN'] = 'true';
-		const trackMock = mock.fn();
 
 		const model = 'test_model';
 		const temperature = 0.5;
@@ -24,6 +21,7 @@ test('collect_learnings tests', async t => {
 		);
 		dbs.input.set('prompt', 'test prompt\n with newlines');
 		dbs.input.set('feedback', 'test feedback');
+		dbs.memory.set('review', 'test review');
 		const code = 'this is output\n\nit contains code';
 		dbs.logs.set(
 			genCode.name,
@@ -31,10 +29,9 @@ test('collect_learnings tests', async t => {
 		);
 		dbs.workspace.set('all_output.txt', 'test workspace\n' + code);
 
-		collectLearnings(model, temperature, steps, dbs);
+		// collectLearnings(model, temperature, steps, dbs);
 
-		// const learnings = await extractLearning(model, temperature, steps, dbs, '');
-		assert.strictEqual(trackMock.mock.calls.length, 1);
+		const learnings = await extractLearning(model, temperature, steps, dbs, '');
 		// expect(trackMock.mock.calls[0][1].event).toBe('learning');
 		// const a = {...trackMock.mock.calls[0][1].properties};
 		// delete a.timestamp;
@@ -42,8 +39,11 @@ test('collect_learnings tests', async t => {
 		// delete b['timestamp'];
 		// expect(a).toEqual(b);
 
-		// expect(JSON.stringify(code)).toBe(learnings.logs);
-		// expect(code).toBe(learnings.workspace);
+		const expectedOutputLog = '--- genCode ---\n\n[{"role":"system","content":"this is output\\n\\nit contains code"}]';
+		const expectedOutputWorkspace = 'test workspace\nthis is output\n\nit contains code';
+
+		assert.strictEqual(learnings.logs, expectedOutputLog);
+		assert.strictEqual(learnings.workspace,expectedOutputWorkspace);
 	});
 });
 

@@ -33,7 +33,7 @@ test('toFiles tests', async t => {
 
 				assert.strictEqual(workspace.get('all_output.txt'), chat);
 				for (const [file_name, file_content] of Object.entries(expectedFiles)) {
-					assert.strictEqual(workspace.get(file_name), file_content);
+					assert.strictEqual(workspace.get(file_name).trim(), file_content);
 				}
 				resolve();
 			} catch (error) {

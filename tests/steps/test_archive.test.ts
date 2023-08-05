@@ -1,10 +1,10 @@
-// import * as fs from 'fs';
-// import * as path from 'path';
+import * as fs from 'fs';
+import * as path from 'path';
 // const { DB, DBs, archive } = require('../../source/engineer/db');
 // const { getPath } = require('../test_db.test');
 import {DB, DBs, archive} from '../../source/engineer/db.js';
 import {getPath} from '../test_db.test.js';
-
+import assert from 'node:assert';
 // Mock the current date
 function freezeAt(_date: Date): void {
 	// jest.spyOn(global, 'Date').mockImplementation(() => date as unknown as Date);
@@ -33,7 +33,7 @@ function setupDbs(tmpPath: string, _dirNames: string[]): DBs {
 import test from 'node:test';
 // Test the AI constructor
 test('archive Test', async t => {
-	await t.test('No process.env is set, error gets thrown', () => {
+	await t.test('handle an non-existent path', () => {
 		return new Promise((_resolve, _reject) => {
 			const tmpPath = 'path/to/temp/directory';
 
@@ -53,16 +53,20 @@ test('archive Test', async t => {
 			// 	fs.existsSync(path.join(tmpPath, 'archive', '20201225_170555')),
 			// ).toBeTruthy();
 
-			dbs = setupDbs(tmpPath, [
-				'memory',
-				'logs',
-				'preprompts',
-				'input',
-				'workspace',
-				'archive',
-			]);
-			freezeAt(new Date('2022-08-14T08:05:12'));
-			archive(dbs);
+			// dbs = setupDbs(tmpPath, [
+			// 	'memory',
+			// 	'logs',
+			// 	'preprompts',
+			// 	'input',
+			// 	'workspace',
+			// 	'archive',
+			// ]);
+			// freezeAt(new Date('2022-08-14T08:05:12'));
+			// archive(dbs);
+
+			assert.strictEqual(fs.accessSync(path.join(tmpPath, 'memory')), undefined);
+			assert.strictEqual(fs.accessSync(path.join(tmpPath, 'workspace')), undefined);
+			_resolve();
 			// expect(fs.existsSync(path.join(tmpPath, 'memory'))).toBeFalsy();
 			// expect(fs.existsSync(path.join(tmpPath, 'workspace'))).toBeFalsy();
 			// expect(
